@@ -31,6 +31,16 @@ if (process.env.NODE_ENV === 'production') {
   }
 }
 
+// Debug route to check server status
+app.get('/api/status', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok',
+    environment: process.env.NODE_ENV,
+    n8nWebhookUrl: process.env.N8N_WEBHOOK_URL || 'not set',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Routes
 app.post('/api/chat', async (req, res) => {
   try {
@@ -40,8 +50,12 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
     
+    console.log('Received message:', message);
+    
     // Forward the message to n8n webhook
     const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL || 'http://localhost:5678/webhook/chatbot';
+    
+    console.log('Forwarding to n8n webhook:', n8nWebhookUrl);
     
     const n8nResponse = await axios.post(n8nWebhookUrl, {
       message,
@@ -49,13 +63,19 @@ app.post('/api/chat', async (req, res) => {
       source: 'chatbot-app'
     });
     
+    console.log('n8n response:', n8nResponse.data);
+    
     // Return the response from n8n
     return res.json({
       reply: n8nResponse.data.reply || 'I received your message, but I\'m not sure how to respond.',
       processed: true
     });
   } catch (error) {
-    console.error('Error processing chat message:', error);
+    console.error('Error processing chat message:', error.message);
+    if (error.response) {
+      console.error('Response status:', error.response.status);
+      console.error('Response data:', error.response.data);
+    }
     
     // If n8n is not available, provide a fallback response
     return res.status(200).json({
@@ -88,4 +108,7 @@ app.get('/health', (req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV}`);
+  console.log(`CORS origin: ${process.env.CORS_ORIGIN || 'http://localhost:5173'}`);
+  console.log(`n8n webhook URL: ${process.env.N8N_WEBHOOK_URL || 'not set'}`);
 });
