@@ -8,7 +8,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: 'Hello! How can I help you today?',
+      content: 'مرحبًا! كيف يمكنني مساعدتك اليوم؟',
       sender: 'bot',
       timestamp: new Date(),
     },
@@ -30,16 +30,28 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true);
 
     try {
+      console.log('Sending message to API:', content);
+      console.log('API URL:', import.meta.env.VITE_API_URL);
+      
       // Send message to webhook
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/chat`,
-        { message: content }
+        { message: content },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          timeout: 15000 // 15 seconds timeout
+        }
       );
+
+      console.log('API response:', response.data);
 
       // Add bot response to chat
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: response.data.reply || "Sorry, I couldn't process your request.",
+        content: response.data.reply || "عذرًا، لم أتمكن من معالجة طلبك.",
         sender: 'bot',
         timestamp: new Date(),
       };
@@ -51,7 +63,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Add error message
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "Sorry, I'm having trouble connecting right now. Please try again later.",
+        content: "عذرًا، أواجه مشكلة في الاتصال حاليًا. يرجى المحاولة مرة أخرى لاحقًا.",
         sender: 'bot',
         timestamp: new Date(),
       };

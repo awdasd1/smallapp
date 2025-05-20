@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: process.env.CORS_ORIGIN || '*', // Allow any origin if CORS_ORIGIN is not set
   methods: ['GET', 'POST'],
   credentials: true
 }));
@@ -37,7 +37,9 @@ app.get('/api/status', (req, res) => {
     status: 'ok',
     environment: process.env.NODE_ENV,
     n8nWebhookUrl: process.env.N8N_WEBHOOK_URL || 'not set',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    apiUrl: process.env.VITE_API_URL || 'not set',
+    corsOrigin: process.env.CORS_ORIGIN || '*'
   });
 });
 
@@ -53,7 +55,15 @@ app.post('/api/chat', async (req, res) => {
     console.log('Received message:', message);
     
     // Forward the message to n8n webhook
-    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL || 'http://localhost:5678/webhook/chatbot';
+    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
+    
+    if (!n8nWebhookUrl) {
+      console.error('N8N_WEBHOOK_URL is not set');
+      return res.status(200).json({
+        reply: "لم يتم تكوين عنوان webhook بشكل صحيح. يرجى التحقق من إعدادات البيئة.",
+        processed: false
+      });
+    }
     
     console.log('Forwarding to n8n webhook:', n8nWebhookUrl);
     
@@ -61,13 +71,19 @@ app.post('/api/chat', async (req, res) => {
       message,
       timestamp: new Date().toISOString(),
       source: 'chatbot-app'
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      timeout: 10000 // 10 seconds timeout
     });
     
     console.log('n8n response:', n8nResponse.data);
     
     // Return the response from n8n
     return res.json({
-      reply: n8nResponse.data.reply || 'I received your message, but I\'m not sure how to respond.',
+      reply: n8nResponse.data.reply || 'لقد استلمت رسالتك، ولكنني غير متأكد من كيفية الرد.',
       processed: true
     });
   } catch (error) {
@@ -75,11 +91,15 @@ app.post('/api/chat', async (req, res) => {
     if (error.response) {
       console.error('Response status:', error.response.status);
       console.error('Response data:', error.response.data);
+    } else if (error.request) {
+      console.error('No response received:', error.request);
+    } else {
+      console.error('Error setting up request:', error.message);
     }
     
     // If n8n is not available, provide a fallback response
     return res.status(200).json({
-      reply: "I'm currently unable to process your request through my workflow engine. Please try again later.",
+      reply: "لا يمكنني معالجة طلبك حاليًا. يرجى التحقق من اتصال الخادم بـ n8n والمحاولة مرة أخرى لاحقًا.",
       processed: false
     });
   }
@@ -105,10 +125,22 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
+// Catch-all route for SPA in production
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    const distPath = join(__dirname, '../dist/index.html');
+    if (fs.existsSync(distPath)) {
+      res.sendFile(distPath);
+    } else {
+      res.status(404).send('Application not built yet');
+    }
+  });
+}
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV}`);
-  console.log(`CORS origin: ${process.env.CORS_ORIGIN || 'http://localhost:5173'}`);
+  console.log(`CORS origin: ${process.env.CORS_ORIGIN || '*'}`);
   console.log(`n8n webhook URL: ${process.env.N8N_WEBHOOK_URL || 'not set'}`);
 });
