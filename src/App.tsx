@@ -45,27 +45,30 @@ import React, { useState } from 'react';
               body: JSON.stringify({ message: newMessage }),
             });
 
-            if (response.ok) {
-              const data = await response.json();
-              if (data && data.response) {
-                const botMessage: Message = {
-                  id: Math.random().toString(),
-                  text: data.response,
-                  sender: 'bot',
-                  timestamp: new Date(),
-                };
-                setMessages(prev => [...prev, botMessage]);
-              } else {
-                throw new Error('No response data received');
-              }
-            } else {
+            if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status}`);
             }
+
+            const data = await response.json();
+            console.log('Response Data:', data); // Log response for debugging
+
+            if (!data || !data.response) {
+              throw new Error('Invalid response format: Missing "response" field');
+            }
+
+            const botMessage: Message = {
+              id: Math.random().toString(),
+              text: data.response,
+              sender: 'bot',
+              timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, botMessage]);
+
           } catch (error) {
-            console.error('Error sending message:', error);
+            console.error('Error details:', error);
             const errorMessage: Message = {
               id: Math.random().toString(),
-              text: 'حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.',
+              text: `حدث خطأ أثناء إرسال الرسالة: ${error.message}`,
               sender: 'bot',
               timestamp: new Date(),
             };
