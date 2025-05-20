@@ -52,8 +52,8 @@ import React, { useState } from 'react';
             const data = await response.json();
             console.log('Response Data:', data);
 
-            // Handle output field in JSON response
-            const botResponse = data.output || data.message || data.text || 'لا يوجد رد متاح';
+            // Handle response from Respond to Webhook
+            const botResponse = data.response || data.message || data.text || 'لا يوجد رد متاح';
             
             const botMessage: Message = {
               id: Math.random().toString(),
