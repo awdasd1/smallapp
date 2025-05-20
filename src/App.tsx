@@ -47,13 +47,19 @@ import React, { useState } from 'react';
 
             if (response.ok) {
               const data = await response.json();
-              const botMessage: Message = {
-                id: Math.random().toString(),
-                text: data.response,
-                sender: 'bot',
-                timestamp: new Date(),
-              };
-              setMessages(prev => [...prev, botMessage]);
+              if (data && data.response) {
+                const botMessage: Message = {
+                  id: Math.random().toString(),
+                  text: data.response,
+                  sender: 'bot',
+                  timestamp: new Date(),
+                };
+                setMessages(prev => [...prev, botMessage]);
+              } else {
+                throw new Error('No response data received');
+              }
+            } else {
+              throw new Error(`HTTP error! status: ${response.status}`);
             }
           } catch (error) {
             console.error('Error sending message:', error);
