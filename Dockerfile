@@ -12,8 +12,10 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the application
-RUN npm run build
+# Add verbose logging to build process
+RUN echo "Building application..." && \
+    # Build with more diagnostic information
+    npm run build || { echo "Build failed - showing TypeScript issues"; exit 1; }
 
 # Stage 2: Serve the application
 FROM nginx:alpine
