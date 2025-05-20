@@ -1,54 +1,62 @@
-# React + TypeScript + Vite
+# تطبيق الدردشة (Chat Bot Application)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+تطبيق دردشة تفاعلي مع دعم للغة العربية وإمكانية رفع الملفات.
 
-Currently, two official plugins are available:
+## المميزات
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- واجهة مستخدم حديثة وبسيطة
+- دعم كامل للغة العربية والكتابة من اليمين إلى اليسار
+- إمكانية رفع وإرفاق الملفات
+- عرض محادثات بتصميم جذاب
+- واجهة مستجيبة تعمل على مختلف الأجهزة
 
-## Expanding the ESLint configuration
+## التقنيات المستخدمة
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React
+- TypeScript
+- Vite
+- Shadcn UI
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## متطلبات التشغيل
+
+- Node.js (الإصدار 16 أو أحدث)
+- npm أو yarn
+
+## طريقة التثبيت
+
+1. استنساخ المستودع
+```
+git clone <رابط-المستودع>
+cd chat-bot-app
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+2. تثبيت التبعيات
 ```
+npm install
+```
+
+3. تشغيل التطبيق في بيئة التطوير
+```
+npm run dev
+```
+
+4. بناء التطبيق للإنتاج
+```
+npm run build
+```
+
+## النشر باستخدام Coolify
+
+هذا المشروع مُعَد للنشر باستخدام منصة Coolify. يحتوي المشروع على ملف `Dockerfile` وإعدادات Nginx اللازمة للنشر.
+
+### خطوات النشر:
+
+1. إنشاء مشروع جديد في Coolify
+2. ربط المشروع بمستودع GitHub
+3. استخدام ملف Dockerfile الموجود في المشروع
+4. تعيين متغيرات البيئة إذا لزم الأمر
+5. بدء عملية النشر
+
+## المساهمة
+
+نرحب بالمساهمات والاقتراحات لتحسين التطبيق!
