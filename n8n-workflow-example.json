@@ -1,0 +1,68 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatbot",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract the message from the incoming webhook\nconst message = $input.item.json.message;\n\n// Simple response logic\nlet reply;\n\nif (message.toLowerCase().includes('hello') || message.toLowerCase().includes('hi')) {\n  reply = 'Hello there! How can I help you today?';\n} else if (message.toLowerCase().includes('help')) {\n  reply = 'I can help you with information, answer questions, or connect you with more resources. What do you need help with?';\n} else if (message.toLowerCase().includes('bye') || message.toLowerCase().includes('goodbye')) {\n  reply = 'Goodbye! Have a great day!';\n} else if (message.toLowerCase().includes('thank')) {\n  reply = \"You're welcome! Is there anything else I can help you with?\";\n} else {\n  reply = `I received your message: \"${message}\". How can I assist you further?`;\n}\n\n// Return the processed data\nreturn {\n  json: {\n    reply,\n    timestamp: new Date().toISOString(),\n    processed: true\n  }\n};"
+      },
+      "name": "Process Message",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$node[\"Process Message\"].json}}",
+        "options": {}
+      },
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Process Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Message": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

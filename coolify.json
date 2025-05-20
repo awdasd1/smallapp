@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "name": "chatbot-webhook",
+  "type": "nodejs",
+  "buildCommand": "npm run build",
+  "startCommand": "node server/index.js",
+  "env": [
+    {
+      "name": "NODE_ENV",
+      "value": "production"
+    },
+    {
+      "name": "PORT",
+      "value": "3001"
+    },
+    {
+      "name": "CORS_ORIGIN",
+      "value": "https://your-app-domain.com"
+    },
+    {
+      "name": "N8N_WEBHOOK_URL",
+      "value": "https://your-n8n-instance.com/webhook/chatbot"
+    }
+  ],
+  "ports": [
+    {
+      "container": 3001,
+      "public": 80
+    }
+  ]
+}
