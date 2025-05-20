@@ -50,15 +50,14 @@ import React, { useState } from 'react';
             }
 
             const data = await response.json();
-            console.log('Response Data:', data); // Log response for debugging
+            console.log('Response Data:', data);
 
-            if (!data || !data.response) {
-              throw new Error('Invalid response format: Missing "response" field');
-            }
-
+            // Handle different response formats
+            const botResponse = data.response || data.message || data.text || 'لا يوجد رد متاح';
+            
             const botMessage: Message = {
               id: Math.random().toString(),
-              text: data.response,
+              text: botResponse,
               sender: 'bot',
               timestamp: new Date(),
             };
